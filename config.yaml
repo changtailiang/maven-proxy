@@ -1,0 +1,71 @@
+# maven-proxy 配置文件示例
+listen: 0.0.0.0
+port: 8880
+context: maven
+localRepository: /data/data
+
+# 用户认证配置
+user:
+  - name: user
+    password: password
+
+# 仓库配置
+repository:
+  # Proxy 仓库 - 代理远程 Maven Central
+  - id: central
+    name: Maven Central Proxy
+    type: proxy
+    mode: 4
+    cache: true
+    target: central
+    mirror:
+      - https://repo1.maven.org/maven2
+      - https://maven.aliyun.com/nexus/content/repositories/central
+    metadata:
+        enableBackup: true
+        maxBackups: 5
+
+  # Hosted 仓库 - 自研包
+  - id: private
+    name: Private Repository
+    type: hosted
+    mode: 6
+    target: private
+
+  # Hosted 仓库 - 第三方上传包
+  - id: 3rdparty
+    name: Third Party Repository
+    type: hosted
+    mode: 6
+    target: 3rdparty
+
+  # Hosted 仓库 - 项目发布包
+  - id: releases
+    name: Release Repository
+    type: hosted
+    mode: 6
+    target: releases
+
+  # Hosted 仓库 - 项目测试包
+  - id: snapshots
+    name: Snapshot Repository
+    type: hosted
+    mode: 6
+    target: snapshots
+
+  # Group 虚拟仓库 - 统一访问入口
+  - id: public
+    name: Public Group Repository
+    type: group
+    mode: 4
+    members:
+      - private      # 优先级1: 自研包
+      - 3rdparty     # 优先级2: 第三方包
+      - releases     # 优先级3: 发布包
+      - snapshots    # 优先级4: 测试包
+      - central      # 优先级5: 远程代理
+
+# 日志配置
+logging:
+  path: ./data/log
+  level: debug
